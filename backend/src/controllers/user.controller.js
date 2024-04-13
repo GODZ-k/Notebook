@@ -8,7 +8,6 @@ import Twilio from "twilio";
 
 const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
-// const number = "+1 516 690 6933"
 const client = new Twilio(accountSid, authToken);
 
 let OTP, getUser;
@@ -55,6 +54,7 @@ const registeruser = asyncHandler(async(req, res) => {
 
         const { username, password, phoneNo } = req.body;
 
+
         const array = [username, password, phoneNo];
 
         // validate fields
@@ -63,7 +63,6 @@ const registeruser = asyncHandler(async(req, res) => {
                 .status(422)
                 .json(new ApiResponse(400, {}, "All fields must be equire"));
         }
-
         // user existance check
         const existedUser = await User.findOne({
             $or: [{ username }, { phoneNo }],
@@ -75,29 +74,33 @@ const registeruser = asyncHandler(async(req, res) => {
                 .json(new ApiResponse(422, {}, "User already exists"));
         }
 
+
         getUser = {
             username,
             phoneNo,
             password,
         };
 
+
         generateOtp(4); // otp generation
         // console.log("generated otp", generatedOtp.spl)
         // console.log(OTP)
+        console.log(typeof username, typeof Number(phoneNo), typeof password)
 
-        // console.log("start");
         const message = await client.messages.create({
             body: `your otp verification for user ${username} is ${OTP}`,
             from: "+15166906933", // Your Twilio phone number
-            to: `+91${phoneNo}`, // Recipient's phone number
+            to: `+91${Number(phoneNo)}`, // Recipient's phone number
         });
-        console.log("Message sent. SID:", message.sid);
 
-        // req.user = { username, password, phoneNo }
+        console.log("Message sent. SID:", message);
+
+        console.log("start", OTP);
 
         return res
             .status(200)
             .json(new ApiResponse(200, message, "Otp sent successfully"));
+
     } catch (error) {
         console.log("Error:", error);
         return res
@@ -110,13 +113,13 @@ const registeruser = asyncHandler(async(req, res) => {
 
 const verifyOtp = asyncHandler(async(req, res) => {
     try {
-        // console.log(getUser)
-        // console.log(getUser.username, getUser.password, getUser.phoneNo)
+        console.log(getUser, OTP)
+            // console.log(getUser.username, getUser.password, getUser.phoneNo)
         const userOtp = req.body.otp;
 
-        // console.log(typeof userOtp, typeof Number(OTP))
+        console.log(typeof Number(userOtp), typeof Number(OTP))
 
-        if (userOtp !== Number(OTP)) {
+        if (Number(userOtp) !== Number(OTP)) {
             return res.status(400).json(new ApiResponse(400, {}, "Invalid Otp"));
         }
 
@@ -156,19 +159,25 @@ const loginuser = asyncHandler(async(req, res) => {
         const { username, phoneNo, password } = req.body;
 
         if (!(username || phoneNo)) {
-            throw new APIError(400, "username and email is required");
+            return res.status(400).json(
+                new ApiResponse(400, {}, "username and phone no is required")
+            )
         }
 
         const user = await User.findOne({ $or: [{ username }, { phoneNo }] });
 
         if (!user) {
-            throw new APIError(400, "user not found ");
+            return res.status(400).json(
+                new ApiResponse(400, {}, "user not found")
+            )
         }
 
         const ispasswordValid = await user.isPasswordCorrect(password);
 
         if (!ispasswordValid) {
-            throw new APIError(400, "Incorrect password");
+            return res.status(400).json(
+                new ApiResponse(400, {}, "Incorrect password")
+            )
         }
 
         const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
@@ -192,7 +201,7 @@ const loginuser = asyncHandler(async(req, res) => {
             .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(
-                    200, { user: loggedInUser, accessToken, refreshToken },
+                    200, { user: loggedInUser, accessToken: accessToken, refreshToken: refreshToken },
                     "User logged in successfully"
                 )
             );

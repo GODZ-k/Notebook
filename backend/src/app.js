@@ -9,8 +9,8 @@ const app = express();
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
-    Credential: true,
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    credentials: true,
+    // optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 
     // methods: "GET"
 }))
