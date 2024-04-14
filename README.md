@@ -8,6 +8,7 @@ This is a simple full-stack note application with user authentication built usin
 * __User Authentication__ : Users can sign up, log in, and log out securely.
 * __Note CRUD Operations__ : Users can create, read, update, and delete notes.
 * __Image Upload__ : Users can upload images along with their notes, powered by Cloudinary and Multer.
+* __Jwt authentication__ : Server will provide a access and refresh jwt token for identify the user identity on every request . 
 * __SMS Authentication__ : Users can verify their identity using Twilio's SMS authentication.
 
 ### Technologies Used
@@ -16,14 +17,14 @@ This is a simple full-stack note application with user authentication built usin
 * __Backend__ : Express, Node.js
 * __Database__ : MongoDB
 * __Image Upload__ : Cloudinary, Multer
-* __Authentication__ : Twilio
+* __Authentication__ : Twilio , Jwt , bcrypt js
 
 ### Installation
 
 #### 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your_username/your_repository.git 
+git clone https://github.com/GODZ-k/Notebook.git
 
 ```
 #### 2. Install dependencies for both frontend and backend:
@@ -45,6 +46,12 @@ npm install
 
 ```makefile
 
+PORT=your_port
+SECRET_KEY=your_secret_key
+TOKEN_EXPIRY=token_expiry
+REFRESH_TOKEN_SECRET_KEY=secret_key
+REFRESH_TOKEN_EXPIRY=token_expiry
+CORS_ORIGIN=origin
 MONGODB_URI=your_mongodb_uri
 TWILIO_ACCOUNT_SID=your_twilio_account_sid
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
